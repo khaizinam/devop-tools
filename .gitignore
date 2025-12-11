@@ -1,9 +1,5 @@
 *.AppImage
 
-*.jpg
-
-*.png
-
 *.mp3
 
 config/

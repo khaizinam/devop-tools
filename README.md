@@ -5,6 +5,13 @@ A comprehensive collection of Bash scripts for automating system administration,
 ## 🚀 Quick Start
 
 ```bash
+cd ~
+mkdir -p mybash
+cd mybash
+git clone git@github.com:khaizinam/devop-tools.git .
+```
+
+```bash
 sudo bash app_ui.sh
 ```
 
@@ -12,6 +19,10 @@ sudo bash app_ui.sh
 ```bash
 bash app_ui.sh
 ```
+
+## 📸 Screenshot
+
+![MyBash UI Example](./docs/example.png)
 
 ## 📋 Available Scripts
 
