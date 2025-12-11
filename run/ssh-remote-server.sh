@@ -7,7 +7,7 @@ DESC="Connect to remote server via SSH with saved configurations"
 # Source UI components
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/../src/ui/ui_common.sh"
-source "$SCRIPT_DIR/../src/ui/scroll_menu.sh"
+source "$SCRIPT_DIR/../src/ui/page_menu.sh"
 
 # Thư mục cấu hình SSH
 CONFIG_DIR="./storage/ssh_config"
@@ -234,8 +234,9 @@ fi
 declare -a CONFIG_FILES
 declare -a CONFIG_NAMES
 declare -a MENU_ITEMS
+declare -a MENU_DESCS
 
-# Function to load and build menu items
+# Function to load and build menu items (with desc placeholders)
 load_menu_items() {
   # Load configurations
   mapfile -t CONFIG_FILES < <(ls "$CONFIG_DIR"/*.conf 2>/dev/null)
@@ -243,17 +244,23 @@ load_menu_items() {
   # Clear arrays before building
   CONFIG_NAMES=()
   MENU_ITEMS=()
+  MENU_DESCS=()
   
-  # Build menu items array
+  # Add Back to Menu as first item (index 0)
+  MENU_ITEMS+=("Back to Menu")
+  MENU_DESCS+=("")
+  
+  # Build menu items array (configs start from index 1)
   for file in "${CONFIG_FILES[@]}"; do
     fname=$(basename "$file")
     CONFIG_NAMES+=("${fname%.conf}")
     MENU_ITEMS+=("${fname%.conf}")
+    MENU_DESCS+=("")  # description placeholder
   done
   
   # Add special options
   MENU_ITEMS+=("New Configuration")
-  MENU_ITEMS+=("Quit (Return to Main Menu)")
+  MENU_DESCS+=("")
 }
 
 # Function to handle quit action
@@ -382,8 +389,10 @@ handle_config_selection() {
   local selected=$1
   local config_count=$2
   
-  if [ $selected -ge 0 ] && [ $selected -lt $config_count ]; then
-    local selected_file="${CONFIG_FILES[$selected]}"
+  # configs start at index 1
+  if [ $selected -ge 1 ] && [ $selected -le $config_count ]; then
+    local idx=$((selected-1))
+    local selected_file="${CONFIG_FILES[$idx]}"
     handle_config_action "$selected_file"
     return 0
   else
@@ -400,26 +409,24 @@ run_main_menu() {
   # Load and build menu items
   load_menu_items
   
-  # Initialize scroll menu
-  scroll_menu_init "${MENU_ITEMS[@]}"
-  
-  # Run scroll menu
-  scroll_menu_run "SSH Remote Connection Manager"
-  local selected=$SCROLL_MENU_RESULT
+  # Run paginated menu (page size 10)
+  page_menu_set_page_size 10
+  page_menu_set_data MENU_ITEMS MENU_DESCS
+  page_menu_run "SSH Remote Connection Manager"
+  local selected=$PAGE_MENU_RESULT
   
   # Check if user cancelled
-  if [ "${SCROLL_MENU_CANCELLED:-0}" -eq 1 ] || [ $selected -eq -1 ]; then
+  if [ "${PAGE_MENU_CANCELLED:-0}" -eq 1 ] || [ $selected -lt 0 ]; then
     handle_quit
   fi
   
   # Calculate indices
   local config_count=${#CONFIG_NAMES[@]}
-  local new_idx=$config_count
-  local quit_idx=$(($config_count + 1))
+  local back_idx=0
+  local new_idx=$((config_count + 1))
   
   # Handle selection
-  if [ $selected -eq $quit_idx ]; then
-    # Quit selected
+  if [ $selected -eq $back_idx ]; then
     handle_quit
   elif [ $selected -eq $new_idx ]; then
     # New configuration selected
