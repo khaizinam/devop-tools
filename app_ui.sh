@@ -159,7 +159,10 @@ main_loop() {
   
   # Run the selected script
   bash "$SELECTED_FILE"
-  
+
+  echo -e "${BOLD}${CYAN}Press Enter to continue...${RESET}"
+  read -r
+
   # Clear screen and restart the loop
   clear
   echo -e "${BOLD}${CYAN}========================================${RESET}"

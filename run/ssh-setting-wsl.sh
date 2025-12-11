@@ -101,6 +101,21 @@ echo -e "${BOLD}${CYAN}    SSH WSL Setup    ${RESET}"
 echo -e "${BOLD}${CYAN}========================================${RESET}"
 echo ""
 
+# Ask for confirmation before deleting current SSH and loading new SSH
+echo -e "${BOLD}${YELLOW}⚠️  Warning: This will delete your current SSH keys and load new ones from storage${RESET}"
+echo -e "${BOLD}${CYAN}Do you want to delete current SSH and load new SSH? (Y/N):${RESET} "
+read -r CONFIRM
+
+# Convert to uppercase for comparison
+CONFIRM=$(echo "$CONFIRM" | tr '[:lower:]' '[:upper:]')
+
+if [ "$CONFIRM" != "Y" ] && [ "$CONFIRM" != "YES" ]; then
+    echo -e "${BOLD}${YELLOW}⚠️  Operation cancelled by user${RESET}"
+    exit 0
+fi
+
+echo ""
+
 # Check SSH agent status
 if check_ssh_agent; then
     echo -e "${BOLD}${GREEN}✅ SSH agent is already running${RESET}"
