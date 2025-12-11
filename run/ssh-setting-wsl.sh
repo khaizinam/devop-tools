@@ -122,10 +122,15 @@ else
     start_ssh_agent
 fi
 
-# Check if .ssh directory exists in current directory
-if [ ! -d ".ssh" ]; then
-    echo -e "${BOLD}${RED}❌ Error: .ssh directory not found in current directory${RESET}"
-    echo -e "${YELLOW}Please make sure you're running this script from the directory containing .ssh folder${RESET}"
+# Get project root and SSH source directory
+PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+SSH_SOURCE_DIR="$PROJECT_ROOT/storage/.ssh"
+
+# Check if .ssh directory exists in storage directory
+if [ ! -d "$SSH_SOURCE_DIR" ]; then
+    echo -e "${BOLD}${RED}❌ Error: .ssh directory not found in storage directory${RESET}"
+    echo -e "${YELLOW}Expected location: $SSH_SOURCE_DIR${RESET}"
+    echo -e "${YELLOW}Please make sure .ssh folder exists in storage/ directory${RESET}"
     exit 1
 fi
 
@@ -136,9 +141,9 @@ echo -e "${GREEN}✅ Cleaned ~/.ssh directory${RESET}"
 echo ""
 
 # Copy SSH keys and config
-echo -e "${BLUE}📋 Copying SSH keys and configuration...${RESET}"
-cp .ssh/* ~/.ssh/ 2>/dev/null || {
-    echo -e "${BOLD}${RED}❌ Error: Failed to copy files from .ssh directory${RESET}"
+echo -e "${BLUE}📋 Copying SSH keys and configuration from storage...${RESET}"
+cp "$SSH_SOURCE_DIR"/* ~/.ssh/ 2>/dev/null || {
+    echo -e "${BOLD}${RED}❌ Error: Failed to copy files from $SSH_SOURCE_DIR${RESET}"
     exit 1
 }
 echo -e "${GREEN}✅ Files copied successfully${RESET}"
