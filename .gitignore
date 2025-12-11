@@ -17,5 +17,3 @@ db_mysql/
 .DS_Store
 
 ssh_config/
-
-docs/
