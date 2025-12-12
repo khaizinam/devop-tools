@@ -3,7 +3,7 @@
 # Depends on ui_common.sh for colors, read_key, cleanup
 
 if [ -z "$UI_COMMON_LOADED" ]; then
-  source "$(dirname "$0")/ui_common.sh"
+  source "$(dirname "${BASH_SOURCE[0]}")/ui_common.sh"
   UI_COMMON_LOADED=1
 fi
 
